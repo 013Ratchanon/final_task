@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:5000", // ปรับเป็น URL backend ของคุณ
+  baseURL: "https://final-task-a1hr.onrender.com", // ปรับเป็น URL backend ของคุณ
   withCredentials: true, // ถ้าใช้ cookie
 });
 
