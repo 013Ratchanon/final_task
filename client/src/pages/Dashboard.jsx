@@ -2,11 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import { useTaskStore } from "../stores/useTaskStore";
 import { useAuthStore } from "../stores/useAuthStore";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
-  const { tasks, fetchTasks, createTask, deleteTask, updateTask } =
-    useTaskStore();
+  const { tasks, fetchTasks, createTask, deleteTask } = useTaskStore();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
