@@ -5,21 +5,32 @@ const cors = require("cors");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = "https://final-task-blond.vercel.app"; // ✅ ต้องมี https://
+const CLIENT_URL = "https://final-task-blond.vercel.app";
 const MONGO_URI =
   "mongodb+srv://013Ratchanon:<db_password>@taskproject.5ctn4gp.mongodb.net/";
 
-// --- CORS ---
+// Middleware
+app.use(express.json());
+
+// CORS
 app.use(
   cors({
     origin: CLIENT_URL,
     credentials: true,
   }),
 );
-app.options("*", cors({ origin: CLIENT_URL, credentials: true })); // รองรับ preflight
 
-// Middleware
-app.use(express.json());
+// Preflight handler
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", CLIENT_URL);
+    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // MongoDB connect
 mongoose
