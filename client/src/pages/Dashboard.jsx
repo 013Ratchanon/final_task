@@ -2,14 +2,16 @@ import { useEffect, useState, useRef } from "react";
 import { useTaskStore } from "../stores/useTaskStore";
 import { useAuthStore } from "../stores/useAuthStore";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // เพิ่ม animation
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
-  const { tasks, fetchTasks, createTask, deleteTask } = useTaskStore();
+  const { tasks, fetchTasks, createTask, deleteTask, updateTask } =
+    useTaskStore();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState(""); // สำหรับรายละเอียด
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef();
@@ -28,9 +30,10 @@ export default function Dashboard() {
 
   const handleAdd = async () => {
     if (!title.trim()) return;
-    await createTask({ title, status: "pending" }); // เพิ่มสถานะ
+    await createTask({ title, description, status: "pending" });
     fetchTasks();
     setTitle("");
+    setDescription("");
   };
 
   const handleDelete = (id) => {
@@ -92,12 +95,18 @@ export default function Dashboard() {
       <div className="p-6 pt-24 max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-purple-900">Tasks</h1>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-col gap-2 mb-6">
           <input
             className="input input-bordered flex-1 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Add a new task..."
+          />
+          <textarea
+            className="textarea textarea-bordered flex-1 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Task description (optional)"
           />
           <button
             className="btn btn-primary animate-bounce"
@@ -111,29 +120,7 @@ export default function Dashboard() {
           <AnimatePresence>
             {tasks.length > 0 ? (
               tasks.map((task) => (
-                <motion.div
-                  key={task._id}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  whileHover={{ scale: 1.02 }}
-                  className={`card p-4 rounded-lg flex justify-between items-center shadow-lg border-l-4 transition
-                    ${task.status === "completed" ? "border-green-400 bg-green-50" : "border-purple-400 bg-purple-50"}`}
-                >
-                  <span
-                    className={`font-medium ${task.status === "completed" ? "text-green-800" : "text-purple-800"}`}
-                  >
-                    {task.title}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDelete(task._id)}
-                      className="btn btn-sm btn-error"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </motion.div>
+                <TaskCard key={task._id} task={task} onDelete={handleDelete} />
               ))
             ) : (
               <p className="text-gray-500 text-center mt-4 text-lg">
@@ -152,5 +139,49 @@ export default function Dashboard() {
         +
       </button>
     </div>
+  );
+}
+
+// Component สำหรับ Task
+function TaskCard({ task, onDelete }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: 50 }}
+      whileHover={{ scale: 1.02 }}
+      className={`card p-4 rounded-lg flex flex-col gap-2 shadow-lg border-l-4 transition
+        ${task.status === "completed" ? "border-green-400 bg-green-50" : "border-purple-400 bg-purple-50"}`}
+    >
+      <div className="flex justify-between items-center">
+        <span
+          className={`font-medium ${task.status === "completed" ? "text-green-800" : "text-purple-800"}`}
+        >
+          {task.title}
+        </span>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-sm btn-info"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? "Hide" : "Show"} Details
+          </button>
+          <button
+            className="btn btn-sm btn-error"
+            onClick={() => onDelete(task._id)}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <p className="text-gray-700 mt-2 border-t pt-2">
+          {task.description || "No description."}
+        </p>
+      )}
+    </motion.div>
   );
 }
