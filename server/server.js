@@ -1,39 +1,40 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
-const corsOrigins = process.env.CLIENT_URL;
+// --- Config ---
+const PORT = 5000; // หรือ Render จะใช้ PORT auto assign
+const CLIENT_URL = "final-task-blond.vercel.app"; // URL ของ Vercel frontend
+const MONGO_URI =
+  "mongodb+srv://<db_username>:<db_password>@taskproject.5ctn4gp.mongodb.net/"; // MongoDB Atlas URI
 
-// CORS
+// --- CORS ---
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: CLIENT_URL, // อนุญาต frontend domain
     credentials: true,
   }),
 );
 
-
-// Middleware
+// --- Middleware ---
 app.use(express.json());
 
-// MongoDB connect
+// --- MongoDB connect ---
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("MongoDB error:", err));
 
-// Routes
+// --- Routes ---
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/tasks", require("./routes/task.routes"));
 
-// Test route
+// --- Test route ---
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Start server
+// --- Start server ---
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
