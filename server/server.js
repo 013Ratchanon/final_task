@@ -8,7 +8,7 @@ const app = express();
 const PORT = 5000; // หรือ Render จะใช้ PORT auto assign
 const CLIENT_URL = "final-task-blond.vercel.app"; // URL ของ Vercel frontend
 const MONGO_URI =
-  "mongodb+srv://<db_username>:<db_password>@taskproject.5ctn4gp.mongodb.net/"; // MongoDB Atlas URI
+  "mongodb+srv://013Ratchanon:<db_password>@taskproject.5ctn4gp.mongodb.net/"; // MongoDB Atlas URI
 
 // --- CORS ---
 app.use(
